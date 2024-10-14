@@ -1,0 +1,16 @@
+dockerfile commands
+
+FROM
+WORKDIR
+COPY
+RUN
+ENV
+EXPOSE 80
+CMD
+ENTRYPOINT
+
+
+
+non root user
+base image
+multipe stage

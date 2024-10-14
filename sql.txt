@@ -1,0 +1,21 @@
+#check theo partition 
+SELECT *  FROM cdr_failed_202405 partition (p20240511)
+WHERE callee = '0975525350'; 
+#join bang 
+SELECT *
+FROM otp_call_partner_202404
+JOIN otp_partner ON otp_call_partner_202404.PartnerId = otp_partner.Id
+WHERE otp_call_partner_202404.AccountName = 'songlong';
+#check theo giờ 
+SELECT backend_user.first_name, COUNT(request_log.created_at) AS totalRequestOCR
+                    FROM {database}.request_log
+                    INNER JOIN {database}.backend_user ON backend_user.id = request_log.user_id
+                    WHERE success='1' AND api_id='1' AND request_log.created_at BETWEEN '2024-03-31 17:00:00' AND '2024-03-31 17:00:00'
+                    GROUP BY backend_user.first_name;
+
+
+
+
+
+https://blog.devart.com/how-to-restore-mysql-database-from-backup.html
+

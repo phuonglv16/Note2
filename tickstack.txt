@@ -1,0 +1,40 @@
+-TICK stack
+#them repository
+sudo vi /etc/yum.repos.d/influxdata.repo
+[influxdb]
+name = InfluxData Repository - RHEL $releasever
+baseurl = https://repos.influxdata.com/rhel/$releasever/$basearch/stable
+enabled = 1
+gpgcheck = 1
+gpgkey = https://repos.influxdata.com/influxdb.key
+
+
+yum repolist
+
+vào link sau :
+https://vietnix.vn/theo-doi-system-metrics-bang-tick-stack-tren-centos-7/
+
+cài đặt tk vào db là user"admin" pass "admin"
+
+vào db
+influx
+auth
+user: admin
+pass: admin
+
+#muốn moniter cái gì thì them vào telegraf.conf
+
+
+
+
+##gửi metric từ statsd 
+chỉnh sửa phần input.statsd 
+protocal
+server
+dùng nc để forward dữ lieu ở port 8125
+
+
+
+
+
+

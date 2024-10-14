@@ -1,0 +1,94 @@
+các bước làm file server + nginx:
+B1: cài nginx và php
+sudo yum install epel-release
+sudo yum install nginx
+sudo yum install php php-fpm php-cli
+
+B2 : set môi trường 
+sudo nano /etc/php-fpm.d/www.conf
+thêm listen = /var/run/php-fpm/www.sock ( nếu k có )
+	
+
+b3: cấu hình nginx và php
+sudo nano /etc/nginx/conf.d/your-site.conf
+server {
+    listen 80;
+    server_name 192.168.1.48;
+
+    location /files {
+        root /usr/share/nginx/html;   # Thư mục chứa file
+        index index.php index.html;
+
+        # Kích hoạt hiển thị danh sách file
+        autoindex on;
+
+        # Ngăn hiển thị các file có đuôi html, css, và php
+        location ~* \.(html|css|php)$ {
+            return 404;  # Trả về 404 cho các file này
+        }
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php-fpm/www.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
+
+Tạo thư mục và file PHP để liệt kê file
+
+sudo mkdir -p /usr/share/nginx/html/files
+sudo nano /usr/share/nginx/html/files/index.php
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>My File Server</title>
+</head>
+<body>
+    <h1>File List</h1>
+    <table>
+        <tr>
+            <th>File</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Size (KB)</th>
+        </tr>
+
+        <?php
+        $dir = '/usr/share/nginx/html/files';  // Thư mục chứa file
+        if ($handle = opendir($dir)) {
+            while (false !== ($entry = readdir($handle))) {
+                if ($entry != "." && $entry != "..") {
+                    // Kiểm tra đuôi file
+                    if (!preg_match('/\.(html|css|php)$/', $entry)) {
+                        $filepath = $dir . '/' . $entry;
+                        $filesize = filesize($filepath) / 1024;  // Kích thước file
+                        $filemtime = filemtime($filepath);  // Thời gian chỉnh sửa
+                        $filedate = date("d-M-y", $filemtime);  // Ngày
+                        $filetime = date("H:i", $filemtime);  // Thời gian
+                        echo "<tr>";
+                        echo "<td><a href=\"$entry\">$entry</a></td>";
+                        echo "<td>$filedate</td>";
+                        echo "<td>$filetime</td>";
+                        echo "<td>" . number_format($filesize, 2) . "</td>";
+                        echo "</tr>";
+                    }
+                }
+            }
+            closedir($handle);
+        }
+        ?>
+    </table>
+</body>
+</html>
+
+sudo systemctl restart nginx
+
+
+

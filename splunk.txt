@@ -1,0 +1,3 @@
+./splunk add forward-server <host name or ip address>:<listening port>
+./splunk add monitor /var/log
+

@@ -1,0 +1,37 @@
+####cấu hình proxy k cho ssh trực tiếp 
+# Cài đặt iptables-services nếu chưa cài đặt
+sudo yum install iptables-services -y
+
+# Tắt firewalld nếu đang sử dụng
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
+# Bật và khởi động iptables
+sudo systemctl start iptables
+sudo systemctl enable iptables
+#xóa quy tắc accept tất cả ssh 
+sudo iptables -D INPUT 6
+#Thêm lại các quy tắc SSH cụ thể và chặn tất cả các kết nối khác
+
+sudo iptables -A INPUT -p tcp -s 192.168.18.135 --dport 22 -j ACCEPT
+sudo iptables -A INPUT -p tcp -s 192.168.1.10 --dport 22 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 22 -j DROP
+
+
+#save quy tắc 
+sudo service iptables save
+
+
+#kiểm tra lại
+sudo iptables -L -v -n
+
+
+#khởi động lại 
+sudo systemctl restart iptables
+
+
+#để ssh trực tiếp lại cần thêm quy tắc 
+sudo iptables -I INPUT 1 -p tcp --dport 22 -j ACCEPT
+
+#save
+
+#khởi đông lại
